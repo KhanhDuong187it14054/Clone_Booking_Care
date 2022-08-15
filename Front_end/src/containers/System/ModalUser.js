@@ -42,7 +42,7 @@ class ModalUser extends Component {
         this.setState({
             ...copyState
         }, () => {
-            console.log('Check state', this.state);
+            // console.log('Check state', this.state);
         })
     }
 
