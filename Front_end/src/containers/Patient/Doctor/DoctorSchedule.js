@@ -8,6 +8,7 @@ import { getScheduleDoctorByDate } from '../../../services/userService';
 import moment from 'moment';
 import localization from 'moment/locale/vi';
 import { FormattedMessage } from 'react-intl';
+import BookingModal from './Modal/BookingModal';
 
 
 class DoctorSchedule extends Component {
@@ -15,13 +16,23 @@ class DoctorSchedule extends Component {
         super(props);
         this.state = {
             allDays: [],
-            allAvailableTime: []
+            allAvailableTime: [],
+            isOpenModalBooking: false,
+            dataScheduleTimeModal: {},
         };
     }
 
     async componentDidMount() {
         let { language } = this.props;
         let allDays = this.getArrDays(language);
+
+        if (this.props.doctorIdFromParent) {
+            let res = await getScheduleDoctorByDate(this.props.doctorIdFromParent, allDays[0].value);
+            this.setState({
+                allAvailableTime: res.data ? res.data : []
+            })
+        }
+
         this.setState({
             allDays: allDays,
         });
@@ -94,8 +105,20 @@ class DoctorSchedule extends Component {
         }
     }
 
+    handleClickScheduleTime = (time) => {
+        this.setState({
+            isOpenModalBooking: true,
+            dataScheduleTimeModal: time
+        })
+    }
+
+    closeBookingClose = () => {
+        this.setState({
+            isOpenModalBooking: false
+        })
+    }
     render() {
-        let { allDays, allAvailableTime } = this.state;
+        let { allDays, allAvailableTime, isOpenModalBooking, dataScheduleTimeModal } = this.state;
         let { language } = this.props;
         return (
             <>
@@ -117,12 +140,15 @@ class DoctorSchedule extends Component {
                         </select>
                     </div>
                     <div class="all-available-time">
-                        <div className="all-available-time">
+                        <div className="icon-calendar">
                             <i className="fas fa-calendar-alt">
-                                <span>
-                                    <FormattedMessage id="patient.detail-doctor.schedule" />
-                                </span>
                             </i>
+                            <span>
+                                <strong>
+
+                                    <FormattedMessage id="patient.detail-doctor.schedule" />
+                                </strong>
+                            </span>
                         </div>
                         <div className="time-content">
                             {allAvailableTime && allAvailableTime.length > 0 ?
@@ -134,6 +160,7 @@ class DoctorSchedule extends Component {
                                             return (
                                                 <button key={index}
                                                     className={language === LANGUAGES.VI ? "btn-vie" : "btn-en"}
+                                                    onClick={() => this.handleClickScheduleTime(item)}
                                                 >{timeDisplay}
                                                 </button>
                                             )
@@ -156,6 +183,11 @@ class DoctorSchedule extends Component {
                         </div>
                     </div>
                 </div>
+                <BookingModal
+                    isOpenModal={isOpenModalBooking}
+                    closeBookingClose={this.closeBookingClose}
+                    dataTime={dataScheduleTimeModal}
+                />
             </>
         );
     }

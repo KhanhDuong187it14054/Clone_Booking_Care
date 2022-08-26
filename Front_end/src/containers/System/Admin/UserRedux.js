@@ -221,11 +221,19 @@ class UserRedux extends Component {
         return (
             <div className="user-redux-container">
                 <div className="title" >User Redux</div>
-                <div className="col-12 my-3">{isGetGenders === true ? "isLoadingGender" : " "}</div>
                 <div className="user-redux-body" >
                     <div className="container">
                         <div className="row">
-                            <div className="col-12 my-3"><FormattedMessage id="manage-user.add" /></div>
+                            <div className="col-12 my-3 title-form">
+                                {this.state.action === CRUD_ACTIONS.EDIT ?
+                                    <div className="title-form-edit">
+                                        <FormattedMessage id="manage-user.edit-user" />
+                                    </div>
+                                    :
+                                    <div className="title-form-add">
+                                        <FormattedMessage id="manage-user.add" />
+                                    </div>}
+                            </div>
                             <div className="col-3">
                                 <label><FormattedMessage id="manage-user.email" /> </label>
                                 <input className="form-control" type="email"
